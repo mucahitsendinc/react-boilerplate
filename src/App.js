@@ -1,24 +1,52 @@
-import logo from './logo.svg';
-import './App.css';
-
+import React from 'react'
+import { ThemeProvider } from "styled-components";
+import {GlobalStyle} from './styles/Global';
+import {LightTheme,DarkTheme} from './styles/Theme'
+import { BrowserRouter  as Router,Route,Switch,Redirect} from "react-router-dom";
+import {Routes} from './Routes'
+import { useSelector } from 'react-redux';
+import axios from 'axios'
 function App() {
+  
+  const {login}=useSelector(state=>state.auth)
+  const {theme}=useSelector(state=>state.site)
+
+  console.log(login)
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+      <ThemeProvider theme={theme==='DarkTheme' ? DarkTheme : LightTheme}>
+
+        <GlobalStyle/>
+        
+          <Router>
+
+            <Switch>
+              {
+
+                Routes.map((route,index)=>{
+
+                  return(
+
+                    <Route key={`route-${index}`} path={route.path} exact={route.exact} render={()=>{
+
+                      if (route.auth && !login){
+
+                        return <Redirect to="/giris-yap"/>
+
+                      }
+
+                      return <route.component {...route.props} />
+                      
+                    }} />
+                  )
+
+                })
+
+              }
+
+            </Switch>
+
+          </Router>
+      </ThemeProvider>
   );
 }
 
